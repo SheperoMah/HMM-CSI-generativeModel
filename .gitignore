@@ -114,3 +114,8 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# json and pkl files
+*.json
+*.pdf
+*.pkl
