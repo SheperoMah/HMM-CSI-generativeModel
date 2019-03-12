@@ -10,21 +10,21 @@ from sklearn.externals import joblib
 def change_off_diagonal_prob(T, constant):
 	""" This function scales the off-diagonal of a transition matrix. Each r
 ow should sum to 1.0 in the imput and output matrices.
-	"""     
+	"""
 	size = T.shape[0]
 	offDiag =  T - T * np.eye(size)
-	scaledOffDiag = constant * offDiag 
+	scaledOffDiag = constant * offDiag
 	scaledT = scaledOffDiag + np.diag(1 - scaledOffDiag.sum(axis=1))
 	return(scaledT)
 
 def change_transition_matrix_of_model(model, randomMat, c):
 	""" Changes the transition matrix of the HMM model. It scales the off-diagonal elements of the randomMat, and renormalize it, then returns a new model with the scaled transition matrix. c has to be in range (0,1].
 	"""
-	assert c > 0 and c <= 1, "The factor c has to be in the range (0,1]" 
-	newMatrix = change_off_diagonal_prob(randomMat, c)      
+	assert c > 0 and c <= 1, "The factor c has to be in the range (0,1]"
+	newMatrix = change_off_diagonal_prob(randomMat, c)
 	modelNew = deepcopy(model)
 	modelNew.transmat_ = newMatrix
-	return(modelNew) 
+	return(modelNew)
 
 def train_hmm_model(trainingData, lengthSequences, numHiddenStates, dimObservations, numIterations, tolerance, randomSeed):
 	""" Trains a Gaussian Mixture HMM model. It initializes the transmission matrix, the means and covariances
@@ -40,8 +40,8 @@ def divide_data(data):
 	"""
 	numDataPoints = data.shape[0]
 	indexes = np.arange(numDataPoints)
-	idxTrain, idxVal = indexes[0:numDataPoints:1], indexes[1:numDataPoints:1]	
-	training, validation = data[idxTrain, :], data[idxVal, :] 
+	idxTrain, idxVal = indexes[0:numDataPoints:1], indexes[1:numDataPoints:1]
+	training, validation = data[idxTrain, :], data[idxVal, :]
 	return(training, validation)
 
 def calculate_length_sequence(mtrx):
@@ -58,3 +58,11 @@ def ks_test(model, dataSets):
 	scores = [stts.ks_2samp(i[0][0].flatten(), i[1].flatten()).statistic for i in list(zip(modelSamples, dataSets))]
 	return(scores)
 
+
+def clean_axes(ax):
+	""" Removes the right and top axes of matplotlib
+	"""
+	ax.spines['right'].set_visible(False)
+	ax.spines['top'].set_visible(False)
+	ax.yaxis.set_ticks_position('left')
+	ax.xaxis.set_ticks_position('bottom')
