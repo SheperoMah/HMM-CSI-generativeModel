@@ -62,6 +62,6 @@ def main(fileName, fntSize = 12):
 		json.dump(maeDict, f, indent=4)
 
 if __name__ == "__main__":
-	
-	fn = sys.argv[1]	
+
+	fn = sys.argv[1]
 	main(fn)
