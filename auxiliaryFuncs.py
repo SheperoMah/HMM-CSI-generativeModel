@@ -66,3 +66,69 @@ def clean_axes(ax):
 	ax.spines['top'].set_visible(False)
 	ax.yaxis.set_ticks_position('left')
 	ax.xaxis.set_ticks_position('bottom')
+
+def eclidean_distance_in_cluster(X, mean):
+	""" Calculates the Eclidean distance of the cluster from a matrix and the mean of vector.
+		D = sum_{i=1}^{n_k} sum_{j=1}^{n_k} ||x_i - x_j||^2
+		  = 2 * n_k * sum_{i=1}^{n_k} ||x_i - \mu_k||^2.
+		  See: https://datasciencelab.wordpress.com/tag/gap-statistic/
+
+	Parameters
+	----------
+	X : np.array
+		Matrix of observations, with shape n*p where p is the length of the
+		vector, i.e., the number of features, and n are the number of observations.
+	mean : np.array
+		The mean of the cluster. A vector with length p.
+
+	Returns
+	-------
+	float :
+		Distance.
+	"""
+	n, p = X.shape
+	assert p == mean.shape[0], "The length of the mean should be equal to the \
+	number of columns in the X."
+
+	distance = X - mean
+	eclideanDistance = np.linalg.norm(X-mean, axis=1) ** 2
+	D = 2 * n * np.sum(eclideanDistance)
+	return(D)
+
+def estimate_wk(drs, nrs):
+	""" W_k = \sum_{i=1}^{K} 1/(2*n_i) * D_i
+	"""
+	wk = np.sum(drs / (2 * nrs))
+	return(wk)
+
+def gap_statistic(wksStar, wk):
+	return(np.mean(wksStar) - wk)
+
+def estimate_wk_model(model, data):
+	k = model.means_.shape[0]
+	_, clusters = model.decode(data)
+	drs = np.zeros(shape=k)
+	nrs = np.zeros(shape=k)
+
+	for i in range(k):
+		idx = clusters == i
+		dataInCluster = data[idx]
+		meanCluster = model.means_[i]
+		drs[i] = eclidean_distance_in_cluster(dataInCluster, meanCluster)
+		nrs[i] = dataInCluster.shape[0]
+
+	wk = estimate_wk(drs, nrs)
+	return(wk)
+
+def estimate_wkStar_samples(model, numberOfSamples, min, max, sizes):
+	log_wkStar_b = np.zeros(numberOfSamples)
+	modelCopy = deepcopy(model)
+	# Change the transmission matrix otherwise the model will fit the widest distribution.
+	k = modelCopy.transmat_.shape[0]
+	modelCopy.transmat_ = 1/k * np.ones((k,k))
+	for i in range(numberOfSamples):
+		rndSample = np.random.uniform(low=min, high=max, size=sizes)
+		log_wkStar_b[i] = np.log(estimate_wk_model(modelCopy, rndSample))
+	eStar_log_wkStar = np.mean(log_wkStar_b)
+	sk = np.sqrt(1+1/numberOfSamples) * np.std(log_wkStar_b)
+	return(eStar_log_wkStar, sk)
