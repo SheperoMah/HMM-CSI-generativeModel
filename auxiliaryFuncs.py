@@ -58,6 +58,13 @@ def ks_test(model, dataSets):
 	scores = [stts.ks_2samp(i[0][0].flatten(), i[1].flatten()).statistic for i in list(zip(modelSamples, dataSets))]
 	return(scores)
 
+def estimate_aic_score(logLik, n, lambda_k):
+	d = n * lambda_k + n * (n - 1)
+	return(-2*logLik + d)
+
+def estimate_bic_score(logLik, n, lambda_k, T):
+	d = n * lambda_k + n * (n - 1)
+	return(-2 * logLik + np.log(T) * d)
 
 def clean_axes(ax):
 	""" Removes the right and top axes of matplotlib
