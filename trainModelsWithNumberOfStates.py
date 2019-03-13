@@ -34,12 +34,12 @@ def main(filename, seed):
 
 		fact = [0.8, 0.4, 0.3, 0.2]
 		for i in fact:
-			locStr = f"_{i*100:0.0f}"
+			locStr = f'_{i*100:0.0f}'
 			newModel = auxFs.change_transition_matrix_of_model(model, oldMatrix, i)
 			scores[f'likelihood{locStr}'] = auxFs.score_model_on_datasets(newModel, dataSets, lengths)
 			scores[f'K-S{locStr}'] = auxFs.ks_test(newModel, dataSets)
-			scores['aic{locStr}'] = auxFs.estimate_aic_score(scores[f'likelihood{locStr}'][0], nStates, 2)
-			scores['bic{locStr}'] = auxFs.estimate_bic_score(scores[f'likelihood{locStr}'][0], nStates, 2, sum(lengthTr))
+			scores[f'aic{locStr}'] = auxFs.estimate_aic_score(scores[f'likelihood{locStr}'][0], nStates, 2)
+			scores[f'bic{locStr}'] = auxFs.estimate_bic_score(scores[f'likelihood{locStr}'][0], nStates, 2, sum(lengthTr))
 			joblib.dump(newModel, f"{filename}_{nStates}{locStr}.pkl")
 
 		with open(f"{filename}_{nStates}_{seed}.json", 'w') as f:
