@@ -28,6 +28,7 @@ def main(filename, seed):
 		scores['train_time_100'] = math.ceil(tEnd - tStart)
 		scores['likelihood_100'] = auxFs.score_model_on_datasets(model, dataSets, lengths)
 		scores['K-S_100'] = auxFs.ks_test(model, dataSets)
+		scores['KLD_100'] = auxFs.kld_test(model, dataSets)
 		scores['aic_100'] = auxFs.estimate_aic_score(scores['likelihood_100'][0], nStates, 2)
 		scores['bic_100'] = auxFs.estimate_bic_score(scores['likelihood_100'][0], nStates, 2, sum(lengthTr))
 		oldMatrix = model.transmat_
@@ -38,6 +39,7 @@ def main(filename, seed):
 			newModel = auxFs.change_transition_matrix_of_model(model, oldMatrix, i)
 			scores[f'likelihood{locStr}'] = auxFs.score_model_on_datasets(newModel, dataSets, lengths)
 			scores[f'K-S{locStr}'] = auxFs.ks_test(newModel, dataSets)
+			scores[f'KLD_{locStr}'] = auxFs.kld_test(newModel, dataSets)
 			scores[f'aic{locStr}'] = auxFs.estimate_aic_score(scores[f'likelihood{locStr}'][0], nStates, 2)
 			scores[f'bic{locStr}'] = auxFs.estimate_bic_score(scores[f'likelihood{locStr}'][0], nStates, 2, sum(lengthTr))
 			joblib.dump(newModel, f"{filename}_{nStates}{locStr}.pkl")
