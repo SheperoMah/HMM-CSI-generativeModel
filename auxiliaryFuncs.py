@@ -60,7 +60,7 @@ def ks_test(model, dataSets):
 
 def kld_test(model, dataSets):
 	modelSamples = [model.sample(len(v))[0] for i, v in enumerate(dataSets)]
-	scores = [stts.entropy(i[0].flatten(), i[1].flatten()).statistic for i in list(zip(dataSets, modelSamples))]
+	scores = [stts.entropy(i[0].flatten(), i[1].flatten()) for i in list(zip(dataSets, modelSamples))]
 	return(scores)
 
 def estimate_aic_score(logLik, n, lambda_k):
