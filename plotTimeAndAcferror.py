@@ -12,13 +12,14 @@ def read_json(fn):
     return(dictionary)
 
 
-def main():
+def main(fntSize=14):
     maeDict1 = read_json(f"Ahawaii_acf_mae.json")
     maeDict2 = read_json(f"A_acf_mae.json")
     labels = ['Hawaii', 'Norrköping']
     ns = range(2,13)
     fgsz = (6,6)
     seed = 100
+    plt.rcParams.update({'font.size': fntSize})
 
     trainTimeHawaii, trainTimeNorr = {}, {}
     for n in ns:
@@ -39,8 +40,8 @@ def main():
     # Plot the training time
     fig2 = plt.figure(figsize=fgsz)
     ax2 = fig2.add_subplot(111)
-    timeH = [trainTimeHawaii[n][f'train_time_{seed}'] for n in ns]
-    timeN = [trainTimeNorr[n][f'train_time_{seed}'] for n in ns]
+    timeH = [trainTimeHawaii[n][f'train_time_100'] for n in ns]
+    timeN = [trainTimeNorr[n][f'train_time_100'] for n in ns]
     ax2.plot(ns, timeH)
     ax2.plot(ns, timeN)
     ax2.set_xlabel('n')

@@ -20,26 +20,28 @@ def main(filename, seed):
 	dataSets = [trDs, valDs]
 	lengths = [lengthTr, lengthVal]
 	scores = {'seed': seed}
-	for nStates in range(2,13):
+	for nStates in range(3,4):
 		tStart = time.time()
 		model = auxFs.train_hmm_model(trDs, lengthTr, nStates, 1, 400, 1e-3, seed)
 		tEnd = time.time()
 		joblib.dump(model, f"{filename}_{nStates}_100.pkl")
 		scores['train_time_100'] = math.ceil(tEnd - tStart)
 		scores['likelihood_100'] = auxFs.score_model_on_datasets(model, dataSets, lengths)
-		scores['K-S_100'] = auxFs.ks_test(model, dataSets)
-		scores['KLD_100'] = auxFs.kld_test(model, dataSets)
+		modelSamples = auxFs.sample_model(model, dataSets)
+		scores['K-S_100'] = auxFs.ks_test(modelSamples, dataSets)
+		scores['KLD_100'] = auxFs.kld_test(modelSamples, dataSets)
 		scores['aic_100'] = auxFs.estimate_aic_score(scores['likelihood_100'][0], nStates, 2)
 		scores['bic_100'] = auxFs.estimate_bic_score(scores['likelihood_100'][0], nStates, 2, sum(lengthTr))
 		oldMatrix = model.transmat_
 
-		fact = [0.8, 0.4, 0.3, 0.2]
+		fact = [0.8, 0.6, 0.5, 0.4, 0.3, 0.2]
 		for i in fact:
 			locStr = f'_{i*100:0.0f}'
 			newModel = auxFs.change_transition_matrix_of_model(model, oldMatrix, i)
 			scores[f'likelihood{locStr}'] = auxFs.score_model_on_datasets(newModel, dataSets, lengths)
-			scores[f'K-S{locStr}'] = auxFs.ks_test(newModel, dataSets)
-			scores[f'KLD_{locStr}'] = auxFs.kld_test(newModel, dataSets)
+			modelSamples = auxFs.sample_model(newModel, dataSets)
+			scores[f'K-S{locStr}'] = auxFs.ks_test(modelSamples, dataSets)
+			scores[f'KLD{locStr}'] = auxFs.kld_test(modelSamples, dataSets)
 			scores[f'aic{locStr}'] = auxFs.estimate_aic_score(scores[f'likelihood{locStr}'][0], nStates, 2)
 			scores[f'bic{locStr}'] = auxFs.estimate_bic_score(scores[f'likelihood{locStr}'][0], nStates, 2, sum(lengthTr))
 			joblib.dump(newModel, f"{filename}_{nStates}{locStr}.pkl")

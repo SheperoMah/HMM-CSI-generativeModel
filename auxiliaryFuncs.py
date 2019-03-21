@@ -53,14 +53,22 @@ def score_model_on_datasets(model, dataSets, lengths):
 	scores = [model.score(i[0], i[1]) for i in list(zip(dataSets, lengths))]
 	return(scores)
 
-def ks_test(model, dataSets):
+def sample_model(model, dataSets):
 	modelSamples = [model.sample(len(v))[0] for i, v in enumerate(dataSets)]
+	return(modelSamples)
+
+def ks_test(modelSamples, dataSets):
 	scores = [stts.ks_2samp(i[0].flatten(), i[1].flatten()).statistic for i in list(zip(modelSamples, dataSets))]
 	return(scores)
 
-def kld_test(model, dataSets):
-	modelSamples = [model.sample(len(v))[0] for i, v in enumerate(dataSets)]
-	scores = [stts.entropy(i[0].flatten(), i[1].flatten()) for i in list(zip(dataSets, modelSamples))]
+def estimate_pdf_using_histogram(data, binList):
+	 apdf, _ = np.histogram(data, bins=binList, density=True)
+	 return(apdf)
+
+def kld_test(modelSamples, dataSets, points=np.linspace(0, 1.5, 25)):
+	epdfDataSets = [estimate_pdf_using_histogram(i, points) for i in dataSets]
+	epdfSamples = [estimate_pdf_using_histogram(i, points) for i in modelSamples]
+	scores = [stts.entropy(i[0].flatten(), i[1].flatten()) for i in list(zip(epdfDataSets, epdfSamples))]
 	return(scores)
 
 def estimate_aic_score(logLik, n, lambda_k):

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
@@ -36,16 +37,17 @@ def main(fileName, fntSize=14):
 	maeDict = {}
 	ax2.plot(acf(trDs.flatten(order="c"), nlags=numLags), color='k', linestyle='-')
 	ax2.plot(acfTst, color='k',linestyle=':')
-	filenames = [f"{fileName}_{i}_100.pkl" for i in range(2,13)]
+	scales = [20, 30, 40, 50, 60, 80, 100]
+	filenames = [f"{fileName}_3_{i}.pkl" for i in scales]
 	for i,v in enumerate(filenames):
 		model = joblib.load(v)
 		X,_ = model.sample(lengthdata)
 		ax1.plot(xKde, kde_fit_estimate(X.flatten(), xKde), linestyle=lnstyle[i%3], color=cols[i%10])
 		acfModel = acf(X, nlags=numLags)
 		ax2.plot(acfModel, linestyle=lnstyle[i%3], color=cols[i%10])
-		maeDict[str(i+2)] = mean_abs_error(acfTst, acfModel)
+		maeDict[str(scales[i]/100)] = mean_abs_error(acfTst, acfModel)
 
-	legendTxt = ["Test data"] + [f"n = {i}"for i in range(2,13)]
+	legendTxt = ["Test data"] + [r"$\phi$" + f" = {i/100:0.2f}"for i in scales]
 	ax1.legend(legendTxt)
 	ax1.set_xlim(0,1.75)
 	ax1.set_ylim(0,3.5)
@@ -57,12 +59,11 @@ def main(fileName, fntSize=14):
 	ax2.set_ylabel("ACF")
 	ax2.set_xlabel("lags (minute)")
 	auxFs.clean_axes(ax2)
-	fig1.savefig(f"{fileName}_states_histograms.pdf")
-	fig2.savefig(f"{fileName}_states_acf.pdf")
-	with open(f"{fileName}_acf_mae.json", 'w') as f:
+	fig1.savefig(f"{fileName}_scaled_histograms.pdf")
+	fig2.savefig(f"{fileName}_scaled_acf.pdf")
+	with open(f"{fileName}_acf_mae_scaled.json", 'w') as f:
 		json.dump(maeDict, f, indent=4)
 
 if __name__ == "__main__":
-
-	fn = sys.argv[1]
-	main(fn)
+	fileName = sys.argv[1]
+	main(fileName)
