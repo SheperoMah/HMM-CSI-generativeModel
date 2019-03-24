@@ -87,6 +87,20 @@ def clean_axes(ax):
 	ax.yaxis.set_ticks_position('left')
 	ax.xaxis.set_ticks_position('bottom')
 
+def find_length_of_consecutive_numbers(data, number):
+	""" Returns the length of the sequence of number in the array.
+	>>> data = np.array([1, 1, 1, 0, 1, 0, 0, 1, 1])
+	>>> find_length_of_consecutive_numbers(data, 1)
+	np.array([3, 1, 2])
+	"""
+	dataOnes = np.ones(data.shape) * (data == number)
+	dataWithInitZero = np.insert(dataOnes, 0, 0.0)
+	dataWithEndZero = np.append(dataWithInitZero, 0.0)
+	diffData = np.diff(dataWithEndZero)
+	lengths = np.where(diffData == -1)[0] - np.where(diffData == 1)[0]
+	return(lengths)
+
+	
 def eclidean_distance_in_cluster(X, mean):
 	""" Calculates the Eclidean distance of the cluster from a matrix and the mean of vector.
 		D = sum_{i=1}^{n_k} sum_{j=1}^{n_k} ||x_i - x_j||^2
