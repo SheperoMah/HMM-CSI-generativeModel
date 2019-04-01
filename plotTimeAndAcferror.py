@@ -12,7 +12,7 @@ def read_json(fn):
     return(dictionary)
 
 
-def main(fntSize=14):
+def main(fntSize=18):
     maeDict1 = read_json(f"Ahawaii_acf_mae.json")
     maeDict2 = read_json(f"A_acf_mae.json")
     labels = ['Hawaii', 'Norrköping']
@@ -29,6 +29,7 @@ def main(fntSize=14):
     # Plot the acf error as function of the state
     fig1 = plt.figure(figsize=fgsz)
     ax1 = fig1.add_subplot(111)
+    fig1.subplots_adjust(left=0.2)
     ax1.plot(ns, maeDict1.values())
     ax1.plot(ns, maeDict2.values())
     ax1.set_xlabel('n')
@@ -40,6 +41,7 @@ def main(fntSize=14):
     # Plot the training time
     fig2 = plt.figure(figsize=fgsz)
     ax2 = fig2.add_subplot(111)
+    fig2.subplots_adjust(left=0.2)
     timeH = [trainTimeHawaii[n][f'train_time_100'] for n in ns]
     timeN = [trainTimeNorr[n][f'train_time_100'] for n in ns]
     ax2.plot(ns, timeH)

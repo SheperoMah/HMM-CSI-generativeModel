@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from sklearn.externals import joblib
 import auxiliaryFuncs as auxFs
 
-def main(fileName, ymax=3.5, fntSize=14):
+def main(fileName, ymax=4.0, fntSize=14):
 	nbins = 100
 	seed = 100
 
@@ -30,10 +30,9 @@ def main(fileName, ymax=3.5, fntSize=14):
 	auxFs.clean_axes(ax)
 
 	scales = [20, 30, 40, 50, 60, 80, 100]
-	filenames = [f"{fileName}_3_{i}.pkl" for i in scales]
+	filenames = [f"{fileName}_3_{i}.txt" for i in scales]
 	for i, v in enumerate(filenames):
-		model = joblib.load(v)
-		X,_ = model.sample(lengthdata)
+		X = np.loadtxt(v)
 		#fig = plt.figure(figsize=(6,6))
 		ax = plt.subplot(2,4, i+2)
 		ax.hist(X, nbins, density=True)

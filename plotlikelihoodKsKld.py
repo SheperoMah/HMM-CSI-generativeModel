@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import auxiliaryFuncs as auxFs
 import matplotlib.ticker as ticker
 
-def main(filename, seed, fntSize=14):
+def main(filename, seed, fntSize=18):
 	fgsz = (6,6)
 	results = {}
 	ns = range(2,13) # number of states
@@ -19,11 +19,12 @@ def main(filename, seed, fntSize=14):
 	for n in ns:
 		with open(f"{filename}_{n}_{seed}.json") as f:
 			results[n] = json.load(f)
-	ylabels = ['log-likelihood', 'KS-test score', 'KLD score']
+	ylabels = ['log-likelihood', 'KS-test score']
 	scales = [1, 1]
-	for i, idx in enumerate(['likelihood', 'K-S', 'KLD']):
+	for i, idx in enumerate(['likelihood', 'K-S']):
 		fig = plt.figure(figsize=fgsz)
 		ax1 = fig.add_subplot(111)
+		fig.subplots_adjust(left=0.2)
 		training = [results[n][idx + f'_100'][0] for n in ns]
 		test = [results[n][idx + f'_100'][1]  for n in ns]
 		ax1.plot(ns, training, '-.')

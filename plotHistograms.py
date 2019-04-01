@@ -30,9 +30,8 @@ def main(fileName, ymax=3.5, fntSize=14):
 	auxFs.clean_axes(ax)
 
 	for i in range(2,13):
-		fileNames = f"{fileName}_{i}_{seed}.pkl"
-		model = joblib.load(fileNames)
-		X,_ = model.sample(lengthdata)
+		fn = f"{fileName}_{i}_100.txt"
+		X = np.loadtxt(fn)
 		#fig = plt.figure(figsize=(6,6))
 		ax = plt.subplot(4,3,i)
 		ax.hist(X, nbins, density=True)

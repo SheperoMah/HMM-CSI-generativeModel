@@ -120,3 +120,4 @@ dmypy.json
 *.pdf
 *.pkl
 *.zip
+*.txt

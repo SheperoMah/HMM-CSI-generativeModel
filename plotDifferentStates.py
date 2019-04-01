@@ -15,9 +15,9 @@ def kde_fit_estimate(data, x):
 	return(kde.evaluate(x))
 
 def mean_abs_error(x1, x2):
-	return(np.mean(abs(x1 - x2)))
+	return(np.nanmean(np.abs(x1 - x2)))
 
-def main(fileName, fntSize=14):
+def main(fileName, fntSize=16):
 	numLags = 60
 	ds = np.loadtxt(f"{fileName}.txt").transpose()
 	trDs, valDs = auxFs.divide_data(ds)
@@ -36,19 +36,18 @@ def main(fileName, fntSize=14):
 	maeDict = {}
 	ax2.plot(acf(trDs.flatten(order="c"), nlags=numLags), color='k', linestyle='-')
 	ax2.plot(acfTst, color='k',linestyle=':')
-	filenames = [f"{fileName}_{i}_100.pkl" for i in range(2,13)]
+	filenames = [f"{fileName}_{i}_100.txt" for i in range(2,13)]
 	for i,v in enumerate(filenames):
-		model = joblib.load(v)
-		X,_ = model.sample(lengthdata)
+		X = np.loadtxt(v)
 		ax1.plot(xKde, kde_fit_estimate(X.flatten(), xKde), linestyle=lnstyle[i%3], color=cols[i%10])
-		acfModel = acf(X, nlags=numLags)
+		acfModel = acf(X[0:100000], nlags=numLags)
 		ax2.plot(acfModel, linestyle=lnstyle[i%3], color=cols[i%10])
 		maeDict[str(i+2)] = mean_abs_error(acfTst, acfModel)
 
 	legendTxt = ["Test data"] + [f"n = {i}"for i in range(2,13)]
 	ax1.legend(legendTxt)
 	ax1.set_xlim(0,1.75)
-	ax1.set_ylim(0,3.5)
+	ax1.set_ylim(0,4.0)
 	ax1.set_ylabel("pdf")
 	ax1.set_xlabel("CSI")
 	auxFs.clean_axes(ax1)
