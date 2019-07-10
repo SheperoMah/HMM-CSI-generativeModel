@@ -27,7 +27,8 @@ def main(filename, seed, sampleLength=1000000):
 		joblib.dump(model, f"{filename}_{nStates}_100.pkl")
 		scores['train_time_100'] = math.ceil(tEnd - tStart)
 		scores['likelihood_100'] = auxFs.score_model_on_datasets(model, dataSets, lengths)
-		modelSample, _  = model.sample(sampleLength)
+		modelSample, _  = auxFs.sample_hmm_model(model, 
+                                sampleLength, 0, True)
 		np.savetxt(f"{filename}_{nStates}_100.txt", modelSample)
 		scores['K-S_100'] = auxFs.ks_test(modelSample, dataSets)
 		#scores['KLD_100'] = auxFs.kld_test(modelSample, dataSets)
@@ -41,7 +42,8 @@ def main(filename, seed, sampleLength=1000000):
 				locStr = f'_{i*100:0.0f}'
 				newModel = auxFs.change_transition_matrix_of_model(model, oldMatrix, i)
 				scores[f'likelihood{locStr}'] = auxFs.score_model_on_datasets(newModel, dataSets, lengths)
-				modelSample, _ = newModel.sample(sampleLength)
+				modelSample, _ = auxFs.sample_hmm_model(newModel,
+                                    sampleLength, 0, True)
 				np.savetxt(f"{filename}_{nStates}{locStr}.txt", modelSample)
 				scores[f'K-S{locStr}'] = auxFs.ks_test(modelSample, dataSets)
 				#scores[f'KLD{locStr}'] = auxFs.kld_test(modelSample, dataSets)

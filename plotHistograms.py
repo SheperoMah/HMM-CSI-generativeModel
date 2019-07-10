@@ -20,7 +20,7 @@ def main(fileName, ymax=3.5, fntSize=14):
 	fig = plt.figure(figsize=(6,8.5))
 	ax = plt.subplot(4,3,1)
 	ax.hist(data, nbins, density=True)
-	ax.set_ylabel("pdf")
+	ax.set_ylabel("PDF")
 	#ax.set_xlabel("CSI")
 	ax.set_title("Test data")
 	ax.set_xlim(0,1.75)
@@ -36,7 +36,7 @@ def main(fileName, ymax=3.5, fntSize=14):
 		ax = plt.subplot(4,3,i)
 		ax.hist(X, nbins, density=True)
 		if i in [4,7,10]:
-			ax.set_ylabel("pdf")
+			ax.set_ylabel("PDF")
 		if i in [10, 11, 12]:
 			ax.set_xlabel("CSI")
 		ax.set_title(f"n = {i}")

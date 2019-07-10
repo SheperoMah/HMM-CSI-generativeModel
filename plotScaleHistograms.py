@@ -20,7 +20,7 @@ def main(fileName, ymax=4.0, fntSize=14):
 	fig = plt.figure(figsize=(6,8.5))
 	ax = plt.subplot(2,4,1)
 	ax.hist(data, nbins, density=True)
-	ax.set_ylabel("pdf")
+	ax.set_ylabel("PDF")
 	#ax.set_xlabel("CSI")
 	ax.set_title("Test data")
 	ax.set_xlim(0,1.75)
@@ -30,14 +30,14 @@ def main(fileName, ymax=4.0, fntSize=14):
 	auxFs.clean_axes(ax)
 
 	scales = [20, 30, 40, 50, 60, 80, 100]
-	filenames = [f"{fileName}_3_{i}.txt" for i in scales]
+	filenames = [f"{fileName}_3_{i}_fixedMeans.txt" for i in scales]
 	for i, v in enumerate(filenames):
 		X = np.loadtxt(v)
 		#fig = plt.figure(figsize=(6,6))
 		ax = plt.subplot(2,4, i+2)
 		ax.hist(X, nbins, density=True)
 		if i in [3]:
-			ax.set_ylabel("pdf")
+			ax.set_ylabel("PDF")
 		if i in range(3,8):
 			ax.set_xlabel("CSI")
 		ax.set_title(r"$\phi$ = "+ f"{scales[i]/100:.2f}")

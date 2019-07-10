@@ -106,6 +106,83 @@ def clean_axes(ax):
     ax.yaxis.set_ticks_position('left')
     ax.xaxis.set_ticks_position('bottom')
 
+def sample_markov_chain(transMatrix, length, initialState=0):
+    """ Samples a state trajectory from a Markov chain.
+
+    Paramters
+    ---------
+    transMatrix : ndarray
+        The Markov chain transition matrix. Must be of shape N * N, 
+    where N is the number of states.
+    length : int
+        Length of the sample, i.e., number of time-steps.
+    initialState : int
+        The initial state, It must be less than 0 <= initialState < N.
+
+    Returns
+    -------
+    list
+        A list with the index of state at each time step.
+    """
+    assert transMatrix.shape[0] == transMatrix.shape[1], "Transition "+\
+    "matrix must be square."
+    assert initialState < transMatrix.shape[0] and initialState >= 0 \
+    and type(initialState) is int, "The initialState must be integer "+\
+    "and 0 <= initialState < numberOfStates."
+    assert length > 0 and type(length) is int, "Length must be " + \
+    "positive integer."
+    
+    rndSmpl = np.random.uniform(size=length)
+    cumSumTransMatrix = np.cumsum(transMatrix, axis=1) 
+    states = [initialState]
+
+    for i in range(length):
+        currentState = states[-1]
+        cSTMRow = cumSumTransMatrix[currentState,:]
+        nextState = np.where(cSTMRow >= rndSmpl[i])[0][0]        
+        states.extend([nextState])
+    return(states)
+
+def sample_observations(stateSeq, dist, limitPositive=False):
+    """ Samples from distributions with each belonging to state.
+    
+    Examples
+    --------
+    >>> dist = {0: lambda: np.random.normal(0.4,1), \
+                1: lambda: np.random.normal(3,0.2)}
+    >>> states = [0,1,0,1,0,0,0,1,1,0,1,1,1,1]
+    >>> sample_observations(stateSeq, dist)
+    >>> sample_observations(stateSeq, dist, True)
+
+    """
+    length = len(stateSeq)
+    samples = []
+    for i in stateSeq:
+        newSample = dist[i]()
+    
+        while limitPositive and newSample < 0.0:
+            newSample = dist[i]()
+      
+        samples.extend([newSample])
+    return(samples)
+
+def sample_hmm_model(model, length, initialState, limitPositive=False):
+    """ Samples from the HMM model. 
+    """
+    hiddenStates = sample_markov_chain(model.transmat_, 
+                        length, initialState)
+    def create_distribution_dict(means, variances):
+        dist={}
+        for i in range(means.shape[0]):
+            dist[i] = lambda x=i: np.random.normal(means[x], 
+                            np.sqrt(variances[x]))
+        return(dist)
+    dist = create_distribution_dict(model.means_.flatten(), 
+                model.covars_.flatten())
+    observations = sample_observations(hiddenStates, dist, 
+                        limitPositive) 
+    return(np.array(observations), np.array(hiddenStates))
+
 def ACF(ts, numLags):
     """ Estimates the ACF for a time series, works only for unidimentional time series.
 
@@ -116,7 +193,7 @@ def ACF(ts, numLags):
         length = ts.shape[0]
         acf = np.mean((ts[0:length - h] - mean) * (ts[h::] - mean)) / variance
         return(acf)
-    return([acf_one_point(ts, average, variance, i) for i in range(numLags)])
+    return([acf_one_point(ts, average, variance, i) for i in range(numLags+1)])
 
 
 def find_length_of_consecutive_numbers(data, number):
